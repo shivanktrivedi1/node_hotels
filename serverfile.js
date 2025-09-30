@@ -3,7 +3,20 @@
 const express = require('express')
 const app = express()
 const db = require('./db')
+const passport = require('./auth')
 require('dotenv').config()
+
+// middleware logging
+const logging = (req, res, next) => {
+    console.log(`[${new Date().toLocaleString()}] Api ${req.originalUrl}`);
+    next()
+}
+
+app.use(logging)
+
+// middleware authentication
+app.use(passport.initialize())
+const localAuthMiddleware = passport.authenticate('local', {session : false})
 
 app.use(express.json())  
 
@@ -29,6 +42,7 @@ const personRoutes = require('./routes/personRoutes')
 const menuRoutes = require('./routes/menuItemRoutes')
 
 // use the routers
+// app.use('/person',localAuthMiddleware, personRoutes)
 app.use('/person', personRoutes)
 app.use('/menu', menuRoutes)
 
